@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARASITES.</title>
+  <style>
+           * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #2c3e50 0%, #4a6491 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+      
+        .instructions {
+            background-color: #f0f8ff;
+            padding: 15px 25px;
+            border-bottom: 1px solid #e1e8ef;
+            font-size: 0.95rem;
+            color: #2c3e50;
+        }
+        
+        .instructions p {
+            margin: 8px 0;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            padding: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+  th {
+            background: linear-gradient(to bottom, #4a6fa5, #2c3e50);
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            padding: 16px 15px;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f8fafd;
+        }
+        
+        tr:hover {
+            background-color: #f0f5ff;
+        }
+        
+        td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #e1e8ef;
+            transition: background-color 0.2s;
+        }
+        
+        .input-row td {
+            padding: 10px 15px;
+            background-color: #f5f9ff;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d0d9e6;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4a6fa5;
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #4CAF50, #2E8B57);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .editable-cell {
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .editable-cell:after {
+            content: "✎";
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.2s;
+            color: #4a6fa5;
+        }
+        
+        .editable-cell:hover:after {
+            opacity: 1;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .edit-btn, .delete-btn {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 0.85rem;
+        }
+        
+        .edit-btn {
+            background: linear-gradient(to bottom, #4a6fa5, #2c3e50);
+        }
+        
+        .edit-btn:hover {
+            background: linear-gradient(to bottom, #3d5c8c, #1e2a38);
+        }
+  .delete-btn {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+        }
+        
+        .delete-btn:hover {
+            background: linear-gradient(to bottom, #c0392b, #a5281b);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 8px;
+            }
+            
+            header {
+                padding: 20px 15px;
+            }
+          h1 {
+                font-size: 1.8rem;
+            }
+            
+            th, td {
+             padding: 12px 10px;
+            }
+        }
+  </style>
+</head>
+<body>
+  <div class="container">
+        <header>
+            <h1>Parasites</h1>
+        </header>
+        
+        <div class="table-container">
+            <table id="parasiteTable">
+                <thead>
+                    <tr>
+                        <th>Parasite</th>
+                        <th>Disease</th>
+                        <th>Treatment</th>
+                        <th>I. Stage</th>
+                        <th>D. Stage</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Input row for adding new entries -->
+                    <tr class="input-row">
+                        <td><input type="text" id="parasiteInput" placeholder="Parasite"></td>
+                        <td><input type="text" id="diseaseInput" placeholder="Disease"></td>
+                        <td><input type="text" id="treatmentInput" placeholder="Treatment"></td>
+                        <td><input type="text" id="initialStageInput" placeholder="Infective stage"></td>
+                        <td><input type="text" id="definitiveStageInput" placeholder="Diagnostic stage"></td>
+                        <td><button id="addButton">Add Entry</button></td>
+                    </tr>
+                    <!-- Data rows will be inserted here -->
+                </tbody>
+            </table>
+            <div id="noDataMessage" class="no-data">No parasite data available. Add new entries using the form above.</div>
+        </div>
+  
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+            const tableBody = document.querySelector('#parasiteTable tbody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            const addButton = document.getElementById('addButton');
+            const clearStorageBtn = document.getElementById('clearStorage');
+            
+            // Property mapping for columns
+            const propertyMap = {
+                0: 'parasite',
+                1: 'disease',
+                2: 'treatment',
+                3: 'initialStage',
+                4: 'definitiveStage'
+            };
+            
+            // Sample initial data
+            const sampleData = [
+                {
+                    parasite: 'Plasmodium falciparum',
+                    disease: 'Malaria',
+                    treatment: 'Artemisinin-based combination therapy',
+                    initialStage: 'Sporozoite',
+                    definitiveStage: 'Human liver'
+                },
+                {
+                    parasite: 'Trypanosoma cruzi',
+                    disease: 'Chagas disease',
+                    treatment: 'Benznidazole, Nifurtimox',
+                    initialStage: 'Trypomastigote',
+                    definitiveStage: 'Human tissues'
+                },
+                {
+                    parasite: 'Schistosoma mansoni',
+                    disease: 'Schistosomiasis',
+                    treatment: 'Praziquantel',
+                    initialStage: 'Cercariae',
+                    definitiveStage: 'Human blood vessels'
+                }
+            ];
+            
+            // Initialize data
+            let parasiteData = JSON.parse(localStorage.getItem('parasiteData')) || sampleData;
+            
+            // Render the table
+            renderTable();
+            
+            // Add new entry
+            addButton.addEventListener('click', addNewEntry);
+            
+            // Clear storage button
+            clearStorageBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to delete all data?')) {
+                    localStorage.removeItem('parasiteData');
+                    parasiteData = [];
+                    renderTable();
+                }
+            });
+            
+            // Handle Enter key in input fields
+            document.querySelectorAll('.input-row input').forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        addNewEntry();
+                    }
+                });
+            });
+    
+    function addNewEntry() {
+                const parasiteInput = document.getElementById('parasiteInput');
+                const diseaseInput = document.getElementById('diseaseInput');
+                const treatmentInput = document.getElementById('treatmentInput');
+                const initialStageInput = document.getElementById('initialStageInput');
+                const definitiveStageInput = document.getElementById('definitiveStageInput');
+                
+                const parasite = parasiteInput.value.trim();
+                const disease = diseaseInput.value.trim();
+                const treatment = treatmentInput.value.trim();
+                const initialStage = initialStageInput.value.trim();
+                const definitiveStage = definitiveStageInput.value.trim();
+                
+                if (!parasite) {
+                    alert('Parasite name is required!');
+                    parasiteInput.focus();
+                    return;
+                }
+                
+                const newEntry = {
+                    parasite,
+                    disease,
+                    treatment,
+                    initialStage,
+                    definitiveStage
+                };
+                
+                parasiteData.push(newEntry);
+                saveAndRender();
+                
+                // Clear inputs
+                parasiteInput.value = '';
+                diseaseInput.value = '';
+                treatmentInput.value = '';
+                initialStageInput.value = '';
+                definitiveStageInput.value = '';
+                parasiteInput.focus();
+            }
+            
+            function saveAndRender() {
+                // Sort alphabetically by parasite name
+                parasiteData.sort((a, b) => a.parasite.localeCompare(b.parasite));
+                
+                // Save to localStorage
+                localStorage.setItem('parasiteData', JSON.stringify(parasiteData));
+                
+                // Render table
+                renderTable();
+            }
+            
+            function renderTable() {
+                // Clear existing rows (except input row)
+                while (tableBody.rows.length > 1) {
+                    tableBody.deleteRow(1);
+                }
+                
+                if (parasiteData.length === 0) {
+                    noDataMessage.style.display = 'block';
+                    return;
+                }
+                
+                noDataMessage.style.display = 'none';
+                
+                // Add data rows
+                parasiteData.forEach((item, index) => {
+                    const row = tableBody.insertRow();
+                    
+                    // Add cells with data
+                    const cell1 = row.insertCell(0);
+                    cell1.textContent = item.parasite;
+                    cell1.className = 'editable-cell';
+                    
+                    const cell2 = row.insertCell(1);
+                    cell2.textContent = item.disease;
+                    cell2.className = 'editable-cell';
+                    
+                    const cell3 = row.insertCell(2);
+                    cell3.textContent = item.treatment;
+                    cell3.className = 'editable-cell';
+                    
+                    const cell4 = row.insertCell(3);
+                    cell4.textContent = item.initialStage;
+                    cell4.className = 'editable-cell';
+                    
+                    const cell5 = row.insertCell(4);
+                    cell5.textContent = item.definitiveStage;
+                    cell5.className = 'editable-cell';
+                    
+                    // Action cell with buttons
+                    const cell6 = row.insertCell(5);
+                    cell6.className = 'actions';
+                    cell6.innerHTML = `
+                        <button class="edit-btn" data-index="${index}">Edit</button>
+                        <button class="delete-btn" data-index="${index}">Delete</button>
+                    `;
+                  
+                  // Add this inside renderTable() after creating cells
+             for (let i = 0; i < 5; i++) {
+              row.cells[i].addEventListener('click', function(e) {
+                if(e.target.tagName === "INPUT") return;
+              enterEditMode(row, index);
+             });
+            }
+                });
+                
+                // Add event listeners for action buttons
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        const row = this.closest('tr');
+                        enterEditMode(row, index);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = this.getAttribute('data-index');
+                        if (confirm('Are you sure you want to delete this entry?')) {
+                            parasiteData.splice(index, 1);
+                            saveAndRender();
+                        }
+                    });
+                });
+            }
+            
+            function enterEditMode(row, index) {
+        const dataItem = parasiteData[index];
+        const originalValues = {
+          parasite: dataItem.parasite,
+          disease: dataItem.disease,
+          treatment: dataItem.treatment,
+          initialStage: dataItem.initialStage,
+          definitiveStage: dataItem.definitiveStage
+        };
+        
+        // Create input fields for each cell
+        for (let i = 0; i < 5; i++) {
+          const cell = row.cells[i];
+          const property = propertyMap[i];
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = dataItem[property];
+          input.dataset.property = property;
+          cell.textContent = '';
+          cell.appendChild(input);
+        }
+        
+        // Change buttons to Save and Cancel
+        const actionCell = row.cells[5];
+        actionCell.innerHTML = `
+          <button class="save-btn" data-index="${index}">Save</button>
+          <button class="cancel-btn" data-index="${index}">Cancel</button>
+        `;
+        
+        // Add event listeners for Save and Cancel
+        actionCell.querySelector('.save-btn').addEventListener('click', function() {
+          saveEditedRow(row, index);
+        });
+        
+        actionCell.querySelector('.cancel-btn').addEventListener('click', function() {
+          cancelEdit(row, index, originalValues);
+        });
+      }
+      
+      function saveEditedRow(row, index) {
+        const dataItem = parasiteData[index];
+        
+        // Update data from input fields
+        for (let i = 0; i < 5; i++) {
+          const input = row.cells[i].querySelector('input');
+          const property = input.dataset.property;
+          dataItem[property] = input.value.trim();
+        }
+        
+        saveAndRender();
+      }
+      
+      function cancelEdit(row, index, originalValues) {
+        // Restore original values without saving
+        const dataItem = parasiteData[index];
+        Object.assign(dataItem, originalValues);
+        saveAndRender();
+      }
+    });
+            
+  </script>  
+</body>
+</html>
